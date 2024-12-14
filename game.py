@@ -45,4 +45,5 @@ while True:
     
     ################# End of Loop ###########
     #refresh frequency
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+          break
