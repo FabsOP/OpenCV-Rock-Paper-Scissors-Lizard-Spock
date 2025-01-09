@@ -1,8 +1,23 @@
 import cv2
 import cvzone
 from cvzone.HandTrackingModule import HandDetector
-import time
+import csv
 # from model import KeyPointClassifier
+
+################# HELPER METHODS ###############
+def normalise(landmarks, boundingBox):
+    normalised_Lm = []
+    x_min, y_min, box_width, box_height = boundingBox
+    
+    for lm in landmarks:
+        x, y, z = lm
+        norm_x = (x - x_min) / box_width
+        norm_y = (y - y_min) / box_height
+        norm_z = z / max(box_width,box_height)  # Assuming depth normalization relative to width
+        normalised_Lm.append([norm_x, norm_y, norm_z])
+    
+    return normalised_Lm
+
 
 ############# UI VARIABLES ###########################
 playerScore = 0
@@ -56,11 +71,12 @@ while True:
         fingers = detector.fingersUp(hand)
         bbox = hand['bbox']
         x_min, y_min, box_width, box_height = bbox
-        print('x_Min =', x_min)
-        print('y_Min =', y_min)
-        print('box_width =', box_width)
-        print('box_height =', box_height)
+        # print('x_Min =', x_min)
+        # print('y_Min =', y_min)
+        # print('box_width =', box_width)
+        # print('box_height =', box_height)
         # print(hand['lmList'])
+        # print(hand)
     
     
     ########## Place Camera img on bg img ###############
@@ -92,7 +108,24 @@ while True:
         trainingSlot = chr(key)
         print("Training slot #" + trainingSlot + " selected")
     
+    elif key == ord('c') and isTraining and hands: #capture hand data and append to training data file
+        hand = hands[0]
+        print("Hand data captured")
+        print("Label:", trainingSlot)
+        print("Handedness:", hand['type'])
+        landmarks = normalise(hand['lmList'],hand['bbox'])
+        print("Hand Landmarks (normalised):", landmarks)
+        
+        with open ('./model/training/training_data.csv', mode="a", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([trainingSlot, hand['type'], landmarks])
+        
+        
+            
     #end program        
     elif key == ord('q'):
           break
+
+
+
     
