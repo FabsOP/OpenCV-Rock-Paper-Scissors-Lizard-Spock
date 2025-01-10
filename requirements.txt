@@ -1,2 +1,6 @@
 mediapipe
 cvzone
+pandas
+numpy
+scikit-learn
+tensorflow

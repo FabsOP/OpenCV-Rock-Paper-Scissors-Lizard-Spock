@@ -2,7 +2,24 @@ import cv2
 import cvzone
 from cvzone.HandTrackingModule import HandDetector
 import csv
-# from model import KeyPointClassifier
+import joblib
+import time
+import random
+
+############# GAME STATE VARIABLES ###########################
+playerScore = 0
+aiScore = 0
+
+playerSign = ""
+aiSign = ""
+isStarted = False
+timerRunning = False
+initialTime = 0
+previousTime = 0
+
+############# TRAINING VARIABLES #####################
+isTraining = False
+trainingSlot = '0'
 
 ################# HELPER METHODS ###############
 def normalise(landmarks, boundingBox):
@@ -13,21 +30,54 @@ def normalise(landmarks, boundingBox):
         x, y, z = lm
         norm_x = (x - x_min) / box_width
         norm_y = (y - y_min) / box_height
-        norm_z = z / max(box_width,box_height)  # Assuming depth normalization relative to width
+        norm_z = z / max(box_width,box_height)
         normalised_Lm.append([norm_x, norm_y, norm_z])
     
     return normalised_Lm
 
+def determineWinner(ai, player):
+    if player == ai:
+        return "draw"
+    elif player == "rock":
+        if ai == "scissors" or ai == "lizard":
+            return "player"
+        else:
+            return "ai"
+    elif player == "paper":
+        if ai == "rock" or ai == "spock":
+            return "player"
+        else:
+            return "ai"
+    elif player == "scissors":
+        if ai == "paper" or ai == "lizard":
+            return "player"
+        else:
+            return "ai"
+    elif player == "lizard":
+        if ai == "spock" or ai == "paper":
+            return "player"
+        else:
+            return "ai"
+    elif player == "spock":
+        if ai == "rock" or ai == "scissors":
+            return "player"
+        else:
+            return "ai"
+    else:
+        return "ai"
+        
+def updateScores(winner):
+    global playerScore
+    global aiScore
+    
+    if winner == "player":
+        playerScore += 1
+    elif winner == "ai":
+        aiScore += 1
 
-############# UI VARIABLES ###########################
-playerScore = 0
-aiScore = 0
-
-playerSign = ""
-aiSign = ""
-
-isTraining = False
-trainingSlot = '0'
+############ LOAD MODEL ################################
+labels = ["rock", "paper", "scissors", "lizard", "spock"]
+clf = joblib.load('./model/model.pkl')
 
 ################## SET UP WEBCAM ######################
 camera = cv2.VideoCapture(0)
@@ -38,12 +88,6 @@ camera.set(4,540)                        #camera height
 ############ CREATE HAND DETECTOR #######################
 detector = HandDetector(maxHands=1)
 
-############ LOAD MODEL ################################
-labels = ["rock", "paper", "scissors", "lizard", "spock"]
-# keypoint_classifier = KeyPointClassifier()
-
-
-
 ############ FRAME UPDATE LOOP ##########################
 while True:  
     
@@ -53,10 +97,10 @@ while True:
     ########## resize camera img 205/540 ##########
     cam = cv2.resize(cam, (0,0), None, 0.379, 0.379)
     
-    ##### Flip camera accross the y-axis to mirror user correctly ####
+    ##### Flip camera accross the y-axis to mirror correctly ####
     cam = cv2.flip(cam, 1)
     
-    ##### Crop camera img to fix in player box ########
+    ##### Crop camera img to fit inside player box on the bg image ########
     cam = cam[:,80:283]
         
     ###### get background img and resize ######
@@ -66,6 +110,7 @@ while True:
     ########## Find hands and update image ######
     hands, cam = detector.findHands(cam, draw=True, flipType=False)
 
+    ###### Detect hand sign using model ##############
     if hands:
         hand = hands[0]
         fingers = detector.fingersUp(hand)
@@ -77,6 +122,47 @@ while True:
         # print('box_height =', box_height)
         # print(hand['lmList'])
         # print(hand)
+        normalised_lm = normalise(hand['lmList'], bbox)
+        flattened_lm = [item for sublist in normalised_lm for item in sublist]
+        
+        # Query the model
+        prediction = clf.predict([flattened_lm])
+        playerSign = labels[prediction[0]]
+        # print(f'Detected sign: {playerSign}')
+    else:
+        playerSign = ""
+    
+    
+    if timerRunning:
+        timer = time.time()- initialTime
+        timer = 3 - int(timer)
+        if timer != previousTime:
+            previousTime = timer
+            print("Time left:", timer)
+        
+        if timer <= 0:
+            print("Time's up!")
+            timerRunning = False
+            isStarted = False
+        
+            #generate ai sign
+            randomIndex = random.randint(0,4)
+            aiSign = labels[randomIndex]
+            print("AI sign:", aiSign)
+            print("Player sign:", playerSign)
+
+            #determine winner
+            winner = determineWinner(aiSign, playerSign)
+            print("Winner:", winner)
+            
+            #update scores
+            updateScores(winner)
+            print("Player Score:", playerScore)
+            print("AI Score:", aiScore)
+            
+            
+    
+    
     
     
     ########## Place Camera img on bg img ###############
@@ -119,6 +205,13 @@ while True:
         with open ('./model/training/training_data.csv', mode="a", newline='') as f:
             writer = csv.writer(f)
             writer.writerow([trainingSlot, hand['type'], landmarks])
+    
+    #start game
+    elif key == ord('s') and (not isStarted):
+        print("Game started")
+        isStarted = True
+        timerRunning = True
+        initialTime = time.time()
         
         
             
