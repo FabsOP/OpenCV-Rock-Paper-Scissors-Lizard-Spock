@@ -12,6 +12,7 @@ aiScore = 0
 
 playerSign = ""
 aiSign = ""
+winner = ""
 isStarted = False
 timerRunning = False
 initialTime = 0
@@ -89,8 +90,7 @@ camera.set(4,540)                        #camera height
 detector = HandDetector(maxHands=1)
 
 ############ FRAME UPDATE LOOP ##########################
-while True:  
-    
+while True:
     ##### get camera img ##########
     success, cam = camera.read()       #return success boolean and image
     
@@ -107,27 +107,47 @@ while True:
     imgBG = cv2.imread("UI/bg.png")
     imgBG = cv2.resize(imgBG, (960, 540)) 
     
+    ########## Update UI Scores ############
+    cv2.putText(imgBG, str(playerScore), (770, 173), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    cv2.putText(imgBG, str(aiScore), (182, 173), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA) 
+    
+    ########## Display AI sign on UI ############
+    cv2.putText(imgBG, aiSign.upper(), (240, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    if aiSign != "":
+        imgAiSign = cv2.imread(f"./UI/{aiSign}.png")
+        imgAiSign = cv2.resize(imgAiSign, (60, 60))
+        # imgBG = cvzone.overlayPNG(imgBG, imgAiSign, (162,200), cv2.IMREAD_UNCHANGED)
+    
+    ########## Display Winner on UI ############
+    if winner != "":
+        result_text = ""
+        if winner == "player":
+            result_text = "You Win!"
+        elif winner == "ai":
+            result_text = "AI Wins!"
+        else:
+            result_text = "Draw!"
+        cv2.putText(imgBG, result_text, (420, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
+    
     ########## Find hands and update image ######
     hands, cam = detector.findHands(cam, draw=True, flipType=False)
 
     ###### Detect hand sign using model ##############
-    if hands:
+    if hands:     
+        
         hand = hands[0]
         fingers = detector.fingersUp(hand)
         bbox = hand['bbox']
         x_min, y_min, box_width, box_height = bbox
-        # print('x_Min =', x_min)
-        # print('y_Min =', y_min)
-        # print('box_width =', box_width)
-        # print('box_height =', box_height)
-        # print(hand['lmList'])
-        # print(hand)
         normalised_lm = normalise(hand['lmList'], bbox)
         flattened_lm = [item for sublist in normalised_lm for item in sublist]
         
         # Query the model
         prediction = clf.predict([flattened_lm])
         playerSign = labels[prediction[0]]
+        
+        # Display the player sign on UI
+        cv2.putText(imgBG, playerSign.upper(), (620, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
         # print(f'Detected sign: {playerSign}')
     else:
         playerSign = ""
@@ -140,25 +160,27 @@ while True:
             previousTime = timer
             print("Time left:", timer)
         
-        if timer <= 0:
-            print("Time's up!")
-            timerRunning = False
-            isStarted = False
+        cv2.putText(imgBG, str(timer), (465, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, cv2.LINE_AA)
         
+        if timer <= 0:
+            # print("Time's up!")        
             #generate ai sign
             randomIndex = random.randint(0,4)
             aiSign = labels[randomIndex]
-            print("AI sign:", aiSign)
-            print("Player sign:", playerSign)
+            # print("AI sign:", aiSign)
+            # print("Player sign:", playerSign)
 
             #determine winner
             winner = determineWinner(aiSign, playerSign)
             print("Winner:", winner)
             
-            #update scores
             updateScores(winner)
             print("Player Score:", playerScore)
             print("AI Score:", aiScore)
+        
+            timerRunning = False
+            isStarted = False
+
             
             
     
@@ -209,6 +231,8 @@ while True:
     #start game
     elif key == ord('s') and (not isStarted):
         print("Game started")
+        aiSign = ""
+        winner = ""
         isStarted = True
         timerRunning = True
         initialTime = time.time()
