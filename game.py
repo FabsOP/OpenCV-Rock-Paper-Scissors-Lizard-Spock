@@ -104,7 +104,7 @@ while True:
     cam = cam[:,80:283]
         
     ###### get background img and resize ######
-    imgBG = cv2.imread("UI/bg.png")
+    imgBG = cv2.imread("UI/bg2.png")
     imgBG = cv2.resize(imgBG, (960, 540)) 
     
     ########## Update UI Scores ############
@@ -112,11 +112,11 @@ while True:
     cv2.putText(imgBG, str(aiScore), (182, 173), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA) 
     
     ########## Display AI sign on UI ############
-    cv2.putText(imgBG, aiSign.upper(), (240, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+    cv2.putText(imgBG, aiSign.upper(), (240, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (250, 250, 250), 1, cv2.LINE_AA)
     if aiSign != "":
-        imgAiSign = cv2.imread(f"./UI/{aiSign}.png")
-        imgAiSign = cv2.resize(imgAiSign, (60, 60))
-        # imgBG = cvzone.overlayPNG(imgBG, imgAiSign, (162,200), cv2.IMREAD_UNCHANGED)
+        imgAiSign = cv2.imread(f"./UI/{aiSign}.png", cv2.IMREAD_UNCHANGED)
+        imgAiSign = cv2.resize(imgAiSign, (80, 80))
+        imgBG = cvzone.overlayPNG(imgBG, imgAiSign, pos=[225,255])
     
     ########## Display Winner on UI ############
     if winner != "":
@@ -127,7 +127,7 @@ while True:
             result_text = "AI Wins!"
         else:
             result_text = "Draw!"
-        cv2.putText(imgBG, result_text, (420, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
+        cv2.putText(imgBG, result_text, (420, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (250, 250, 250), 2, cv2.LINE_AA)
     
     ########## Find hands and update image ######
     hands, cam = detector.findHands(cam, draw=True, flipType=False)
@@ -147,7 +147,7 @@ while True:
         playerSign = labels[prediction[0]]
         
         # Display the player sign on UI
-        cv2.putText(imgBG, playerSign.upper(), (620, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+        cv2.putText(imgBG, playerSign.upper(), (620, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (250, 250, 250), 1, cv2.LINE_AA)
         # print(f'Detected sign: {playerSign}')
     else:
         playerSign = ""
@@ -160,7 +160,7 @@ while True:
             previousTime = timer
             print("Time left:", timer)
         
-        cv2.putText(imgBG, str(timer), (465, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2, cv2.LINE_AA)
+        cv2.putText(imgBG, str(timer), (465, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, (250, 250, 250), 2, cv2.LINE_AA)
         
         if timer <= 0:
             # print("Time's up!")        
