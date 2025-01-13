@@ -15,6 +15,11 @@ OpenCV (Open Source Computer Vision Library) is used for real-time image process
 4. The winner will be displayed on the screen.
 
 # Rules
+![Rules Image](./rules.webp)
+https://images.app.goo.gl/eg7f5pxQUEsiCEXAA
+
+
+The rules of the game are as follows:
 - Rock crushes Scissors
 - Scissors cuts Paper
 - Paper covers Rock
@@ -26,7 +31,6 @@ OpenCV (Open Source Computer Vision Library) is used for real-time image process
 - Paper disproves Spock
 - Spock vaporizes Rock
 
-![Rules Image](./rules.webp)
 
 # Adding your own training data
 1. Activate training mode by pressing the 't' key.
