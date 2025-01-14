@@ -4,3 +4,5 @@ pandas
 numpy
 scikit-learn
 tensorflow
+playsound==1.2.2
+pygame

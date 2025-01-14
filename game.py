@@ -5,6 +5,14 @@ import csv
 import joblib
 import time
 import random
+from playsound import playsound
+import pygame
+
+###### PLAY MUSIC #########
+pygame.mixer.init()
+pygame.mixer.music.load('sounds/bgMusic.mp3')
+pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
+pygame.mixer.music.set_volume(0.5)  # set the volume to 50%
 
 ############# GAME STATE VARIABLES ###########################
 playerScore = 0
@@ -139,6 +147,7 @@ while True:
         fingers = detector.fingersUp(hand)
         bbox = hand['bbox']
         x_min, y_min, box_width, box_height = bbox
+                
         normalised_lm = normalise(hand['lmList'], bbox)
         flattened_lm = [item for sublist in normalised_lm for item in sublist]
         
@@ -173,6 +182,11 @@ while True:
             #determine winner
             winner = determineWinner(aiSign, playerSign)
             print("Winner:", winner)
+            try:
+                playsound(f'sounds/{winner}.wav', False)
+            except:
+                print("No sound file found for", winner)
+
             
             updateScores(winner)
             print("Player Score:", playerScore)
@@ -236,6 +250,11 @@ while True:
         isStarted = True
         timerRunning = True
         initialTime = time.time()
+        #play countdown sound
+        try:
+            playsound('sounds/321.wav', False)
+        except:
+            print("No sound file found for countdown")
         
         
             
