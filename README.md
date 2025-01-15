@@ -2,7 +2,9 @@
 This project extends the traditional game of rock paper scissors to 5 hand signs, featuring AI and computer vision. It leverages a Random Forest classifier and OpenCV for real-time hand sign recognition and winner determination.
 
 ## Demo Video
-<video controls src="RPSLS Demo.mp4" title="Title"></video>
+https://github.com/user-attachments/assets/0a81fd4e-6f04-4601-b9c7-b4e244df9f36
+
+
 
 ## Random Forest Classifier
 Random Forest is chosen for its robustness and ability to handle a large number of input variables. It creates a 'forest' of decision trees, each trained on a random subset of the training data. The final prediction is made by aggregating the predictions of all individual trees, reducing overfitting and improving accuracy.
