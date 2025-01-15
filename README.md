@@ -13,6 +13,7 @@ Random Forest is chosen for its robustness and ability to handle a large number 
 OpenCV (Open Source Computer Vision Library) is used for real-time image processing. It captures video from the webcam, processes the frames to detect and recognize hand signs, and feeds the processed data into the Random Forest classifier. OpenCV provides various tools for image processing, such as contour detection, image filtering, and feature extraction, which are essential for accurately identifying hand signs.
 
 # How to Play
+0. Before you start, ensure you have all the necessary modules installed by running 'pip install requirements.txt' inside the project directory terminal (ideally within a virtual environment).
 1. Run `game.py`.
 2. Start the game by pressing the 's' key.
 3. Show your hand sign to the camera.
