@@ -161,7 +161,7 @@ while True:
     else:
         playerSign = ""
     
-    
+    #update timer
     if timerRunning:
         timer = time.time()- initialTime
         timer = 3 - int(timer)
@@ -172,12 +172,12 @@ while True:
         cv2.putText(imgBG, str(timer), (465, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, (250, 250, 250), 2, cv2.LINE_AA)
         
         if timer <= 0:
-            # print("Time's up!")        
+            print("Time's up!")        
             #generate ai sign
             randomIndex = random.randint(0,4)
             aiSign = labels[randomIndex]
-            # print("AI sign:", aiSign)
-            # print("Player sign:", playerSign)
+            print("AI sign:", aiSign)
+            print("Player sign:", playerSign)
 
             #determine winner
             winner = determineWinner(aiSign, playerSign)
