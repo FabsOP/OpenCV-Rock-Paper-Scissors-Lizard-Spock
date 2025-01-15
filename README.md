@@ -1,12 +1,14 @@
 # OpenCV-Rock-Paper-Scissors-Lizard-Spock
 This project extends the traditional game of rock paper scissors to 5 hand signs, featuring AI and computer vision. It leverages a Random Forest classifier and OpenCV for real-time hand sign recognition and winner determination.
 
+## Demo Video
+<video controls src="RPSLS Demo.mp4" title="Title"></video>
+
 ## Random Forest Classifier
 Random Forest is chosen for its robustness and ability to handle a large number of input variables. It creates a 'forest' of decision trees, each trained on a random subset of the training data. The final prediction is made by aggregating the predictions of all individual trees, reducing overfitting and improving accuracy.
 
 ## OpenCV
 OpenCV (Open Source Computer Vision Library) is used for real-time image processing. It captures video from the webcam, processes the frames to detect and recognize hand signs, and feeds the processed data into the Random Forest classifier. OpenCV provides various tools for image processing, such as contour detection, image filtering, and feature extraction, which are essential for accurately identifying hand signs.
-
 
 # How to Play
 1. Run `game.py`.
