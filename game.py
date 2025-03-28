@@ -202,7 +202,8 @@ while True:
     
     
     ########## Place Camera img on bg img ###############
-    imgBG[199:404,598:801] = cam
+    cam_resized = cv2.resize(cam, (203, 205))  # Resize to match the target region
+    imgBG[199:404, 598:801] = cam_resized
     
     ########## Show images ####################
     #Show camera img
